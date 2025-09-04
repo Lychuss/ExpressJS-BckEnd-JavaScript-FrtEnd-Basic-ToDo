@@ -1,0 +1,200 @@
+/* styles.css - Modern Responsive To-Do List */
+
+/* ===== Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  height: 100%;
+}
+
+/* ===== Layout ===== */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  min-height: 100vh;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1200px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar .brand {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.nav-btn {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.badge {
+  background: #fff;
+  color: #333;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+/* ===== Main ===== */
+.main {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.hero .title {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.hero .subtitle {
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.quick-actions .btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: transform 0.3s;
+}
+
+.quick-actions .btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+/* ===== Tasks ===== */
+.tasks {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+}
+
+.task {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: background 0.3s;
+}
+
+.task:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tick input {
+  display: none;
+}
+
+.tick .box {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+}
+
+.tick input:checked + .box::after {
+  content: '✓';
+  position: absolute;
+  top: -4px;
+  left: 3px;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* ===== Footer ===== */
+footer {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin-top: auto;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1rem;
+  }
+
+  .main {
+    padding: 1rem;
+  }
+}
+
+.add {
+    position: absolute;
+    right: 20px; /* distance from left */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; /* adjust size */
+    height: 20px;
+    pointer-events: none;
+  }

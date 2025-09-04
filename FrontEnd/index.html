@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modern To-Do — HTML & CSS Only</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Hidden controls for CSS-only behaviors -->
+  <input type="radio" name="filter" id="filter-all" hidden checked>
+  <input type="radio" name="filter" id="filter-active" hidden>
+  <input type="radio" name="filter" id="filter-completed" hidden>
+
+  <div class="container">
+    <input type="checkbox" id="theme-toggle" hidden>
+    <div class="app">
+
+      <!-- Sidebar -->
+      <aside class="sidebar glass">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>FlowTasks</h1>
+          </div>
+        </div>
+
+        <div class="toggle" role="group" aria-label="Theme toggle">
+          <span>Theme</span>
+          <label class="switch" for="theme-toggle">
+            <input type="checkbox" aria-label="Toggle dark theme">
+            <span class="track" aria-hidden="true"></span>
+            <span class="thumb" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <nav aria-label="Filters">
+          <label for="filter-all" class="nav-btn" role="button">
+            <span>📋</span>
+            <span>All Tasks</span>
+          </label>
+          <label for="filter-active" class="nav-btn" role="button">
+            <span>⚪</span>
+            <span>Active</span>
+          </label>
+          <label for="filter-completed" class="nav-btn" role="button">
+            <span>✅</span>
+            <span>Completed</span>
+          </label>
+        </nav>
+      </aside>
+
+      <!-- Main -->
+      <main class="main">
+        <header class="hero">
+          <h2 class="title">Plan your day</h2>
+          <div class="quick-actions">
+            <a class="btn" href="#tasks">Jump to tasks</a>
+          </div>
+        </header>
+
+        <section id="tasks" class="tasks">
+          <input class="task glass add-card" aria-labelledby="addLabel">
+          <img src="./images/add.png" alt="add" class="add">
+          </article>
+        </section>
+      </main>
+
+    </div>
+  </div>
+</body>
+</html>
