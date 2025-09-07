@@ -1,4 +1,4 @@
-/* styles.css - Modern Responsive To-Do List */
+/* styles.css - Modern Responsive To-Do List + Login/Signup */
 
 /* ===== Reset ===== */
 * {
@@ -190,11 +190,81 @@ footer {
 }
 
 .add {
-    position: absolute;
-    right: 20px; /* distance from left */
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px; /* adjust size */
-    height: 20px;
-    pointer-events: none;
-  }
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+/* ===== Modern Login & Signup Styles ===== */
+.auth-container {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  width: 350px;
+  max-width: 90%;
+  padding: 40px 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  margin: 2rem auto;
+  color: #fff;
+}
+
+.auth-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #fff;
+}
+
+.auth-container input[type="text"],
+.auth-container input[type="email"],
+.auth-container input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 8px;
+  outline: none;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.auth-container input:focus {
+  border-color: #fff;
+  box-shadow: 0 0 5px rgba(255,255,255,0.5);
+}
+
+.auth-container button {
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.auth-container button:hover {
+  background: rgba(255,255,255,0.8);
+}
+
+.auth-container .switch {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+}
+
+.auth-container .switch a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-container .switch a:hover {
+  color: #ffd700;
+}

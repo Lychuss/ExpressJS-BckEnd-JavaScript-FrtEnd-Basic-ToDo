@@ -1,9 +1,13 @@
-import  express, {json} from 'express';
+import  express from 'express';
 import { router } from './Controller/routes.js';
+import cors from 'cors';
 
 const app = express();
 
-app.use(json());
+app.use(express.json());
+app.use(cors({
+    origin: '*'
+}));
 app.use('/', router);
 
 app.listen(5000, () => {

@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import express from 'express';
 import { createToken, authenticated } from '/ExpressJS-ToDoList/BackEnd/Middlewares/authentication.js';
 
+
 export const router = express();
 
 router.get('/', (req, res) => {
