@@ -268,3 +268,12 @@ footer {
 .auth-container .switch a:hover {
   color: #ffd700;
 }
+
+#text {
+  color: lightcoral;
+  font-weight: bold;
+  font-size: 12px;
+  position: absolute;
+  top: 330px;
+  margin-left: 5px;
+}

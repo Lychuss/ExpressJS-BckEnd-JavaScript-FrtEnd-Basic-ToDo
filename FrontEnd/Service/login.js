@@ -6,11 +6,6 @@ button.addEventListener('click', async () => {
     const getUsername = username.value;
     const getPassword = password.value;
 
-    const log = {
-            username: getUsername,
-            password: getPassword
-    }
-
     console.log(log);
     
     const response = await fetch('http://localhost:5000/auth/login', {

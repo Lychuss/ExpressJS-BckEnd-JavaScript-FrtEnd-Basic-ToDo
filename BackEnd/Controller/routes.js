@@ -11,15 +11,27 @@ router.get('/', (req, res) => {
 });
 
 router.post('/auth/signup', async (req, res) => {
-    const {username, password} = req.body;
-    const bcryptPass = await bcrypt.genSalt(10);
-    const hashPass = await bcrypt.hash(password, bcryptPass);
-    console.log(hashPass);
-    const newTodo = await pool.query(
-        `INSERT INTO users (username, password) VALUES ($1, $2)`,
-        [username, hashPass]
+    const {username, email, password} = req.body;
+
+    const duplicate = await pool.query(
+        `SELECT * FROM users WHERE username = $1
+         OR users.email = $2`, [username, email]
     );
-    res.json(newTodo);
+
+    if(duplicate.rowCount != 0) return res.status(400).json({message: 'Username or email is already used!'});
+
+    //Like its an encryption for hashing
+    const bcryptPass = await bcrypt.genSalt(10);
+
+    //It hash the password using the encrpytion which is 10
+    const hashPass = await bcrypt.hash(password, bcryptPass);
+
+    const newTodo = await pool.query(
+        `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
+        [username, email, hashPass]
+    );
+    res.status(200).json({message: 'Sign up successfully'});
+    window.location.href = '/FrontEnd/Interface/login.html';
 });
 
 router.post('/auth/login', async (req, res) => {
