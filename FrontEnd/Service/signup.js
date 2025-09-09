@@ -22,8 +22,7 @@ button.addEventListener('click', async () => {
     });
     console.log(response.status);
     if(response.status === 200){
-        //window.location.href = '/FrontEnd/Interface/login.html'
-        console.log(response.json);
+        window.location.href = '/FrontEnd/Interface/login.html';
     } 
   } else {
      text.textContent = 'Incorrect confirm password'

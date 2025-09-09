@@ -5,8 +5,6 @@ const button = document.getElementById('button');
 button.addEventListener('click', async () => {
     const getUsername = username.value;
     const getPassword = password.value;
-
-    console.log(log);
     
     const response = await fetch('http://localhost:5000/auth/login', {
         method: 'POST',
@@ -21,6 +19,10 @@ button.addEventListener('click', async () => {
 
     const data = await response.json();
 
-    localStorage.setItem('token', JSON.stringify(data));
+    if(data != null){
+        localStorage.setItem('token', JSON.stringify(data));
+        window.location.href = '/FrontEnd/Interface/index.html';
+    }
+
 });
 

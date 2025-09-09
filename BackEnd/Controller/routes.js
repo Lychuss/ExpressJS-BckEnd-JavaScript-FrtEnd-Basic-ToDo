@@ -1,4 +1,4 @@
-import { pool } from '/ExpressJS-ToDoList/BackEnd/Database/database.js';
+import * as logics from '/ExpressJS-ToDoList/BackEnd/Services/logics.js';
 import bcrypt from 'bcrypt';
 import express from 'express';
 import { createToken, authenticated } from '/ExpressJS-ToDoList/BackEnd/Middlewares/authentication.js';
@@ -13,10 +13,9 @@ router.get('/', (req, res) => {
 router.post('/auth/signup', async (req, res) => {
     const {username, email, password} = req.body;
 
-    const duplicate = await pool.query(
-        `SELECT * FROM users WHERE username = $1
-         OR users.email = $2`, [username, email]
-    );
+    const duplicate = await logics.duplicate(username, email);
+
+    console.log(logics.duplicate(username, email));
 
     if(duplicate.rowCount != 0) return res.status(400).json({message: 'Username or email is already used!'});
 
@@ -26,10 +25,8 @@ router.post('/auth/signup', async (req, res) => {
     //It hash the password using the encrpytion which is 10
     const hashPass = await bcrypt.hash(password, bcryptPass);
 
-    const newTodo = await pool.query(
-        `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
-        [username, email, hashPass]
-    );
+    await logics.newUser(username, email, hashPass);
+    
     res.status(200).json({message: 'Sign up successfully'});
     window.location.href = '/FrontEnd/Interface/login.html';
 });
@@ -38,10 +35,7 @@ router.post('/auth/login', async (req, res) => {
     const {username, password} = req.body;
 
     //Query in the postgres to get the users
-    const user = await pool.query(
-        `SELECT users.username, users.password FROM users WHERE username = $1`,
-        [username]
-    );
+    const user = await logics.user(username);
     const foundUser = user.rows[0];
     console.log(foundUser.username);
 
@@ -70,10 +64,7 @@ router.get('/protected/tasks', authenticated, async (req, res) => {
 
 router.post('/items/add', async (req, res) => {
     const {item_name, item_type, item_quantity} = req.body;
-    const addItem = await pool.query(
-        `INSERT INTO items (item_name, item_type, item_quantity) VALUES ($1, $2, $3)`,
-        [item_name, item_type, item_quantity]
-    );
+    const addItem = await logics.addItem(item_name, item_type, item_quantity);
     res.json(addItem);
 });
 
