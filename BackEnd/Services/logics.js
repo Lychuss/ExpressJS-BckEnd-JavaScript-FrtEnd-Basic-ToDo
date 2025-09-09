@@ -16,14 +16,14 @@ export async function newUser(username, email, hashPass){
 
 export async function user(username){
     return await pool.query(
-        `SELECT users.username, users.password FROM users WHERE username = $1`,
+        `SELECT * FROM users WHERE username = $1`,
         [username]
     );
 }
 
-export async function addItem(item_name, item_type, item_quantity) {
+export async function addItem(task, date, userId) {
     return await pool.query(
-        `INSERT INTO items (item_name, item_type, item_quantity) VALUES ($1, $2, $3)`,
-        [item_name, item_type, item_quantity]
+        `INSERT INTO items (task, date, user_id) VALUES ($1, $2, $3)`,
+        [task, date, userId]
     );
 }

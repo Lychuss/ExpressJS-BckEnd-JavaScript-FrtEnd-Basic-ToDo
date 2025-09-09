@@ -6,11 +6,12 @@ CREATE TABLE users (
     password VARCHAR NOT NULL
 );
 
-CREATE TABLE items (
+CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
-    item_name VARCHAR NOT NULL,
-    item_type VARCHAR NOT NULL,
-    item_quantity int NOT NULL
+    tasks VARCHAR NOT NULL,
+    date DATE NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 SELECT * FROM users WHERE username = username

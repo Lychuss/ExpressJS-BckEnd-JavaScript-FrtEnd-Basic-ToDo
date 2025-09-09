@@ -37,7 +37,6 @@ router.post('/auth/login', async (req, res) => {
     //Query in the postgres to get the users
     const user = await logics.user(username);
     const foundUser = user.rows[0];
-    console.log(foundUser.username);
 
     //Check if the query has found a user
     if(user.rowCount === 0){
@@ -54,17 +53,20 @@ router.post('/auth/login', async (req, res) => {
     if(!unhashPass) return res.status(404).send('Incorrect password!');
 
     const token = createToken(foundUser.username, password);
+    const userId = foundUser.user_id;
+    console.log(foundUser);
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ token, userId });
 });
 
 router.get('/protected/tasks', authenticated, async (req, res) => {
     res.status(200).send('Welcome');
 });
 
-router.post('/items/add', async (req, res) => {
-    const {item_name, item_type, item_quantity} = req.body;
-    const addItem = await logics.addItem(item_name, item_type, item_quantity);
+router.post('/tasks/:userId/add', async (req, res) => {
+    const userId = req.params.userId;
+    const {task, date} = req.body;
+    const addItem = await logics.addItem(task, date, userId);
     res.json(addItem);
 });
 

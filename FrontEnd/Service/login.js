@@ -20,9 +20,8 @@ button.addEventListener('click', async () => {
     const data = await response.json();
 
     if(data != null){
-        localStorage.setItem('token', JSON.stringify(data));
+        localStorage.setItem('user', JSON.stringify(data));
         window.location.href = '/FrontEnd/Interface/index.html';
     }
-
 });
 

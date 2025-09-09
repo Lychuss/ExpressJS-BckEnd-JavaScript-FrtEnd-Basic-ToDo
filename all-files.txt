@@ -12,7 +12,8 @@ app.use('/', router);
 
 app.listen(5000, () => {
     console.log('Server listening to port 5000');
-})import { pool } from '/ExpressJS-ToDoList/BackEnd/Database/database.js';
+})
+import * as logics from '/ExpressJS-ToDoList/BackEnd/Services/logics.js';
 import bcrypt from 'bcrypt';
 import express from 'express';
 import { createToken, authenticated } from '/ExpressJS-ToDoList/BackEnd/Middlewares/authentication.js';
@@ -25,27 +26,32 @@ router.get('/', (req, res) => {
 });
 
 router.post('/auth/signup', async (req, res) => {
-    const {username, password} = req.body;
+    const {username, email, password} = req.body;
+
+    const duplicate = await logics.duplicate(username, email);
+
+    console.log(logics.duplicate(username, email));
+
+    if(duplicate.rowCount != 0) return res.status(400).json({message: 'Username or email is already used!'});
+
+    //Like its an encryption for hashing
     const bcryptPass = await bcrypt.genSalt(10);
+
+    //It hash the password using the encrpytion which is 10
     const hashPass = await bcrypt.hash(password, bcryptPass);
-    console.log(hashPass);
-    const newTodo = await pool.query(
-        `INSERT INTO users (username, password) VALUES ($1, $2)`,
-        [username, hashPass]
-    );
-    res.json(newTodo);
+
+    await logics.newUser(username, email, hashPass);
+    
+    res.status(200).json({message: 'Sign up successfully'});
+    window.location.href = '/FrontEnd/Interface/login.html';
 });
 
 router.post('/auth/login', async (req, res) => {
     const {username, password} = req.body;
 
     //Query in the postgres to get the users
-    const user = await pool.query(
-        `SELECT users.username, users.password FROM users WHERE username = $1`,
-        [username]
-    );
+    const user = await logics.user(username);
     const foundUser = user.rows[0];
-    console.log(foundUser.username);
 
     //Check if the query has found a user
     if(user.rowCount === 0){
@@ -62,20 +68,20 @@ router.post('/auth/login', async (req, res) => {
     if(!unhashPass) return res.status(404).send('Incorrect password!');
 
     const token = createToken(foundUser.username, password);
+    const userId = foundUser.user_id;
+    console.log(foundUser);
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ token, userId });
 });
 
 router.get('/protected/tasks', authenticated, async (req, res) => {
     res.status(200).send('Welcome');
 });
 
-router.post('/items/add', async (req, res) => {
-    const {item_name, item_type, item_quantity} = req.body;
-    const addItem = await pool.query(
-        `INSERT INTO items (item_name, item_type, item_quantity) VALUES ($1, $2, $3)`,
-        [item_name, item_type, item_quantity]
-    );
+router.post('/tasks/:userId/add', async (req, res) => {
+    const userId = req.params.userId;
+    const {task, date} = req.body;
+    const addItem = await logics.addItem(task, date, userId);
     res.json(addItem);
 });
 
@@ -83,6 +89,7 @@ router.post('/items/add', async (req, res) => {
 
 
 
+.
 import pkg  from 'pg';
 
 const { Pool } = pkg;
@@ -95,6 +102,7 @@ export const pool = new Pool({
     database: 'Express-ToDo'
 });
 
+.
 CREATE DATABASE Express-ToDO;
 
 CREATE TABLE users (
@@ -103,14 +111,34 @@ CREATE TABLE users (
     password VARCHAR NOT NULL
 );
 
-CREATE TABLE items (
+CREATE TABLE tasks (
     id BIGSERIAL PRIMARY KEY,
-    item_name VARCHAR NOT NULL,
-    item_type VARCHAR NOT NULL,
-    item_quantity int NOT NULL
+    tasks VARCHAR NOT NULL,
+    date DATE NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
+SELECT * FROM users WHERE username = username
+OR users.email = email;
 
+INSERT INTO items (
+    item_name, 
+    item_type, 
+    item_quantity
+)
+ VALUES (item_name, item_type, item_quantity);
+ 
+INSERT INTO users (
+    username,
+    email, 
+    password
+) 
+ VALUES (username, email, password);
+
+SELECT users.username, users.password FROM users 
+WHERE username = username;
+.
 import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = 'cfc441f8ca1d0058aab81d8d6eaeb975267b06d6683a5e1026795cbf37fa6a7f';
@@ -137,6 +165,37 @@ export const authenticated = (req, res, next) => {
     });
 };
 
+.
+import { pool } from '/ExpressJS-ToDoList/BackEnd/Database/database.js';
+
+export async function duplicate(username, email){
+    return await pool.query(
+        `SELECT * FROM users WHERE username = $1
+         OR users.email = $2`, [username, email]
+    );
+}    
+
+export async function newUser(username, email, hashPass){
+    return await pool.query(
+        `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
+        [username, email, hashPass]
+    );
+}
+
+export async function user(username){
+    return await pool.query(
+        `SELECT * FROM users WHERE username = $1`,
+        [username]
+    );
+}
+
+export async function addItem(task, date, userId) {
+    return await pool.query(
+        `INSERT INTO items (task, date, user_id) VALUES ($1, $2, $3)`,
+        [task, date, userId]
+    );
+}
+.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -203,16 +262,18 @@ export const authenticated = (req, res, next) => {
         </header>
 
         <section id="tasks" class="tasks">
-          <input class="task glass add-card" aria-labelledby="addLabel">
-          <img src="./images/add.png" alt="add" class="add">
+          <input id="task" class="task glass add-card" aria-labelledby="addLabel">
+          <img id="add" src="/FrontEnd/images/add.png" alt="add" class="add">
           </article>
         </section>
       </main>
 
     </div>
   </div>
+  <script src="/FrontEnd/Service/home.js"></script>
 </body>
 </html>
+.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -237,6 +298,7 @@ export const authenticated = (req, res, next) => {
 <script src="/FrontEnd/Service/login.js"></script>
 </body>
 </html>
+.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -253,17 +315,20 @@ export const authenticated = (req, res, next) => {
   <form>
     <input id="username" type="text" placeholder="Username" required>
     <input id="email" type="email" placeholder="Email" required>
-    <input type="password" placeholder="Password" required>
-    <input type="password" placeholder="Confirm Password" required>
-    <button type="submit">Sign Up</button>
+    <input id="password" type="password" placeholder="Password" required>
+    <input id="confirm" type="password" placeholder="Confirm Password" required>
+    <p id="text"></p>
+    <button id="button" type="button">Sign Up</button>
   </form>
   <div class="switch">
     Already have an account? <a href="login.html">Login</a>
   </div>
   <small>&copy; 2025 MyWebsite</small>
 </div>
+<script src="/FrontEnd/Service/signup.js"></script>
 </body>
 </html>
+.
 /* styles.css - Modern Responsive To-Do List + Login/Signup */
 
 /* ===== Reset ===== */
@@ -534,6 +599,34 @@ footer {
 .auth-container .switch a:hover {
   color: #ffd700;
 }
+
+#text {
+  color: lightcoral;
+  font-weight: bold;
+  font-size: 12px;
+  position: absolute;
+  top: 330px;
+  margin-left: 5px;
+}.
+const add = document.getElementById('add');
+const tasks = document.getElementById('tasks');
+const task = document.getElementById('task');
+
+const user = JSON.parse(localStorage.getItem('user'));
+
+add.addEventListener('click', async () => {
+    const response = await fetch(`http://localhost:5000/tasks/${userId}/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user?.token}`
+        },
+        body: JSON.stringify({
+            task: task.value,
+            date: '2024-1-23',
+        })
+    })
+});.
 const username = document.getElementById('username');
 const password = document.getElementById('password');
 const button = document.getElementById('button');
@@ -541,13 +634,6 @@ const button = document.getElementById('button');
 button.addEventListener('click', async () => {
     const getUsername = username.value;
     const getPassword = password.value;
-
-    const log = {
-            username: getUsername,
-            password: getPassword
-    }
-
-    console.log(log);
     
     const response = await fetch('http://localhost:5000/auth/login', {
         method: 'POST',
@@ -562,6 +648,40 @@ button.addEventListener('click', async () => {
 
     const data = await response.json();
 
-    localStorage.setItem('token', JSON.stringify(data));
+    if(data != null){
+        localStorage.setItem('user', JSON.stringify(data));
+        window.location.href = '/FrontEnd/Interface/index.html';
+    }
 });
 
+.
+const username = document.getElementById('username');
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const confirm = document.getElementById('confirm');
+const text = document.getElementById('text');
+const button = document.getElementById('button');
+
+button.addEventListener('click', async () => {
+    console.log(username.value, email.value, password.value);
+
+    if(confirm.value === password.value){
+    const response = await fetch('http://localhost:5000/auth/signup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username.value,
+            email: email.value,
+            password: password.value,
+        })
+    });
+    console.log(response.status);
+    if(response.status === 200){
+        window.location.href = '/FrontEnd/Interface/login.html';
+    } 
+  } else {
+     text.textContent = 'Incorrect confirm password'
+  }
+});.
