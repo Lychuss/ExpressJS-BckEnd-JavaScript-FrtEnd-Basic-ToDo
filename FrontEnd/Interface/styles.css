@@ -129,6 +129,7 @@ html, body {
 
 .task {
   display: flex;
+  margin-right: 70px; 
   gap: 1rem;
   align-items: center;
   padding: 1rem;
@@ -190,13 +191,10 @@ footer {
 }
 
 .add {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
   width: 20px;
   height: 20px;
   pointer-events: none;
+  cursor: pointer;
 }
 
 /* ===== Modern Login & Signup Styles ===== */
@@ -276,4 +274,16 @@ footer {
   position: absolute;
   top: 330px;
   margin-left: 5px;
+}
+
+#button-add {
+  position: absolute;
+  top: 15px;
+  left: 830px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  margin-right: 900px;
+  cursor: pointer;
 }

@@ -1,7 +1,7 @@
 CREATE DATABASE Express-ToDO;
 
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
+    user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR NOT NULL,
     password VARCHAR NOT NULL
 );

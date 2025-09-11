@@ -21,9 +21,16 @@ export async function user(username){
     );
 }
 
+export async function getUserId(username){
+    return await pool.query(
+        `SELECT users.user_id FROM users WHERE username = $1`,
+        [username]
+    );
+}
+
 export async function addItem(task, date, userId) {
     return await pool.query(
-        `INSERT INTO items (task, date, user_id) VALUES ($1, $2, $3)`,
+        `INSERT INTO tasks (tasks, date, user_id) VALUES ($1, $2, $3)`,
         [task, date, userId]
     );
 }

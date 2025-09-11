@@ -1,7 +1,7 @@
 import * as logics from '/ExpressJS-ToDoList/BackEnd/Services/logics.js';
 import bcrypt from 'bcrypt';
 import express from 'express';
-import { createToken, authenticated } from '/ExpressJS-ToDoList/BackEnd/Middlewares/authentication.js';
+import { createToken, authenticated, getUser } from '/ExpressJS-ToDoList/BackEnd/Middlewares/authentication.js';
 
 
 export const router = express();
@@ -53,21 +53,24 @@ router.post('/auth/login', async (req, res) => {
     if(!unhashPass) return res.status(404).send('Incorrect password!');
 
     const token = createToken(foundUser.username, password);
-    const userId = foundUser.user_id;
     console.log(foundUser);
 
-    return res.status(200).json({ token, userId });
+    return res.status(200).json({ token });
 });
 
 router.get('/protected/tasks', authenticated, async (req, res) => {
     res.status(200).send('Welcome');
 });
 
-router.post('/tasks/:userId/add', async (req, res) => {
-    const userId = req.params.userId;
+router.post('/tasks/:token/add', async (req, res) => {
+    const token = req.params.token;
+    const user = getUser(token);
+    const results = await logics.getUserId(user);
+    const userId = results.rows[0];
     const {task, date} = req.body;
-    const addItem = await logics.addItem(task, date, userId);
+    const addItem = await logics.addItem(task, date, userId.user_id);
     res.json(addItem);
+    console.log('Done!');
 });
 
 

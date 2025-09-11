@@ -11,6 +11,16 @@ export const createToken = (userUsername, userPassword) => {
     return token;
 };
 
+export const getUser = (token) => {
+    return jwt.verify(token, SECRET_KEY, (err, decode) => {
+        if(err){
+            return null;
+        }
+        console.log(decode);
+        return decode.username
+    });
+};
+
 export const authenticated = (req, res, next) => {
     const bearerHeader = req.headers['authorization'];
     const token = bearerHeader && bearerHeader.split(' ')[1];
