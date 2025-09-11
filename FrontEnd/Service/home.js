@@ -6,7 +6,7 @@ const userId = JSON.parse(localStorage.getItem('user'));
 
 add.addEventListener('click', async () => {
     console.log(userId.token);
-    const response = await fetch(`http://localhost:5000/tasks/${userId.token}/add`, {
+    const response = await fetch(`http://localhost:5000/tasks/add`, {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',

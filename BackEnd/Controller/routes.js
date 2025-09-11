@@ -58,20 +58,31 @@ router.post('/auth/login', async (req, res) => {
     return res.status(200).json({ token });
 });
 
-router.get('/protected/tasks', authenticated, async (req, res) => {
-    res.status(200).send('Welcome');
+router.post('/tasks/add', async (req, res) => {
+    try {
+        const header = req.headers.authorization
+
+        if(!header) return res.status(401);
+
+            const token = header.split(' ')[1];
+
+            const user = getUser(token);
+
+            const results = await logics.getUserId(user);
+
+            const userId = results.rows[0];
+
+            const {task, date} = req.body;
+
+            const addItem = await logics.addItem(task, date, userId.user_id);
+
+            res.json(addItem);
+
+    } catch (err){
+        return res.status(401);
+    }
 });
 
-router.post('/tasks/:token/add', async (req, res) => {
-    const token = req.params.token;
-    const user = getUser(token);
-    const results = await logics.getUserId(user);
-    const userId = results.rows[0];
-    const {task, date} = req.body;
-    const addItem = await logics.addItem(task, date, userId.user_id);
-    res.json(addItem);
-    console.log('Done!');
-});
 
 
 
