@@ -22,6 +22,7 @@ export const getUser = (token) => {
 };
 
 export const authenticated = (req, res, next) => {
+    
     const bearerHeader = req.headers['authorization'];
     const token = bearerHeader && bearerHeader.split(' ')[1];
 

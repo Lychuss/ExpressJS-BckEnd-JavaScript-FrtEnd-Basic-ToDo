@@ -33,3 +33,7 @@ INSERT INTO users (
 
 SELECT users.username, users.password FROM users 
 WHERE username = username;
+
+SELECT tasks.tasks, tasks.date FROM tasks
+WHERE user_id = 9 
+ORDER BY tasks DESC LIMIT 1;

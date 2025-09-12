@@ -53,33 +53,41 @@ router.post('/auth/login', async (req, res) => {
     if(!unhashPass) return res.status(404).send('Incorrect password!');
 
     const token = createToken(foundUser.username, password);
-    console.log(foundUser);
+    const userId = foundUser.user_id;
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ token, userId });
 });
 
-router.post('/tasks/add', async (req, res) => {
+router.post('/tasks/add/:userId', authenticated, async (req, res) => {
     try {
-        const header = req.headers.authorization
+        console.log('hello');
 
-        if(!header) return res.status(401);
+        const userId = req.params.userId;
+        const { task, date } = req.body;
 
-            const token = header.split(' ')[1];
+        logics.addItem(task, date, userId);
 
-            const user = getUser(token);
-
-            const results = await logics.getUserId(user);
-
-            const userId = results.rows[0];
-
-            const {task, date} = req.body;
-
-            const addItem = await logics.addItem(task, date, userId.user_id);
-
-            res.json(addItem);
+        return res.status(200).json({ success: 'You have fully added a task'});
 
     } catch (err){
         return res.status(401);
+    }
+});
+
+router.get('/getTasks/:userId', authenticated, async (req, res) => {
+    try {
+
+        const userId = req.params.userId;
+
+        const data = await logics.getTasks(userId);
+        
+        const { tasks, date } = data.rows[0];
+
+        return res.status(200).json({ tasks, date});
+
+    } catch (err){
+        console.log(err);
+        return res.json({ error: 'There is an error'}); 
     }
 });
 

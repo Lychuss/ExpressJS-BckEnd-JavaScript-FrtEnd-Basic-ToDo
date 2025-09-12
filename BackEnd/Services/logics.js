@@ -34,3 +34,10 @@ export async function addItem(task, date, userId) {
         [task, date, userId]
     );
 }
+
+export async function getTasks(userId){
+    return await pool.query(
+        `SELECT tasks.tasks, tasks.date FROM tasks WHERE user_id = $1
+         ORDER BY id DESC LIMIT 1;`, [ userId ]
+    );
+}
