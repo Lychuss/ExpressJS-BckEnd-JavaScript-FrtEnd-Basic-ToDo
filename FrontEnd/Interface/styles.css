@@ -287,3 +287,30 @@ footer {
   margin-right: 900px;
   cursor: pointer;
 }
+
+.displaytask{
+  text-align: start;
+  display: flex;
+  margin-right: 60px;
+  font-weight: lighter;
+  font-size: 12px;
+  padding: 10px;
+  color: black;
+  border: solid black;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.remove {
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+  position:absolute;
+  left: 830px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  margin-right: 900px;
+  cursor: pointer;
+}

@@ -1,9 +1,9 @@
-export async function addTasks(userId){
-    const response = await fetch(`http://localhost:5000/tasks/add/${userId.userId}`, {
+export async function addTasks(userId, token){
+    const response = await fetch(`http://localhost:5000/tasks/add/${userId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userId?.token}`
+            'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
             task: task.value,
@@ -20,11 +20,11 @@ export async function addTasks(userId){
     return response.status;
 }
 
-export async function getTasks(userId){ 
-    const response1 = await fetch(`http://localhost:5000/getTasks/${userId.userId}`, {
+export async function getTasks(userId, token){ 
+    const response1 = await fetch(`http://localhost:5000/getTasks/${userId}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${userId?.token}`
+                'Authorization': `Bearer ${token}`
             }
         });
 

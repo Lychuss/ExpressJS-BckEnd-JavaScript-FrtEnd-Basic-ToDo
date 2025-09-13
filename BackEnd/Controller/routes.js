@@ -81,9 +81,9 @@ router.get('/getTasks/:userId', authenticated, async (req, res) => {
 
         const data = await logics.getTasks(userId);
         
-        const { tasks, date } = data.rows[0];
+        const { tasks, date, Id } = data.rows[0];
 
-        return res.status(200).json({ tasks, date});
+        return res.status(200).json({ tasks, date, Id});
 
     } catch (err){
         console.log(err);
