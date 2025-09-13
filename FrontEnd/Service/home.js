@@ -1,34 +1,22 @@
+import * as websitelogics from './websitelogic.js';
+
 const add = document.getElementById('button-add');
 const tasks = document.getElementById('tasks');
 const task = document.getElementById('task');
 
+const userTasks = JSON.parse(localStorage.getItem('tasks')) || []; 
 const userId = JSON.parse(localStorage.getItem('user'));
 
 add.addEventListener('click', async () => {
 
-    const response = await fetch(`http://localhost:5000/tasks/add/${userId.userId}`, {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userId?.token}`
-    },
-    body: JSON.stringify({
-        task: task.value,
-        date: '2024-1-23',
-        })
-    });
+    websitelogics.addTasks(userId);
+    
+    const response = await websitelogics.getTasks(userId);
 
-    console.log('hello1');
+    userTasks.push(response);
 
-    const response1 = await fetch(`http://localhost:5000/getTasks/${userId.userId}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${userId?.token}`
-        }
-    });
+    localStorage.setItem('tasks', JSON.stringify(userTasks));
 
-    const data = await response1.json();
-    console.log('Abot ba');
-    console.log(data);
 });
+
 
