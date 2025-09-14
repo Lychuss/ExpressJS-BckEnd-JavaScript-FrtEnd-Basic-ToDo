@@ -314,3 +314,9 @@ footer {
   margin-right: 900px;
   cursor: pointer;
 }
+
+#allTask {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

@@ -37,7 +37,14 @@ export async function addItem(task, date, userId) {
 
 export async function getTasks(userId){
     return await pool.query(
-        `SELECT tasks.tasks, tasks.date FROM tasks WHERE user_id = $1
+        `SELECT tasks.tasks, tasks.date, tasks.Id FROM tasks WHERE user_id = $1
          ORDER BY id DESC LIMIT 1;`, [ userId ]
+    );
+}
+
+export async function removeTask(userId, taskId){
+    return await pool.query(
+        `DELETE FROM tasks WHERE user_id = $1 AND tasks.Id = $2;`, 
+        [userId, taskId]
     );
 }

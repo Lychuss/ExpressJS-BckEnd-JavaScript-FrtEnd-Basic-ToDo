@@ -80,14 +80,31 @@ router.get('/getTasks/:userId', authenticated, async (req, res) => {
         const userId = req.params.userId;
 
         const data = await logics.getTasks(userId);
-        
-        const { tasks, date, Id } = data.rows[0];
 
-        return res.status(200).json({ tasks, date, Id});
+        const datas = data.rows[0];
+
+        console.log(datas);
+        
+        const { tasks, date, id } = datas;
+
+        return res.status(200).json({ tasks, date, id });
 
     } catch (err){
         console.log(err);
         return res.json({ error: 'There is an error'}); 
+    }
+});
+
+router.delete('/removeTasks/:userId/:taskId', authenticated, (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const taskId = req.params.taskId;
+
+        logics.removeTask(userId, taskId);
+
+        return res.status(204).json({message: 'success'});
+    } catch (err) {
+        return res.status(400);
     }
 });
 

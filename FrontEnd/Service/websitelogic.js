@@ -1,4 +1,4 @@
-export async function addTasks(userId, token){
+export async function addTasks(userId, token, task){
     const response = await fetch(`http://localhost:5000/tasks/add/${userId}`, {
         method: 'POST',
         headers: {
@@ -36,3 +36,15 @@ export async function getTasks(userId, token){
 
     return response1.status;
 }
+
+export async function removeTask(userId, taskId, token){
+    const response = await fetch(`http://localhost:5000/removeTasks/${userId}/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    return response.status;
+}
+
