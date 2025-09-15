@@ -12,11 +12,10 @@ app.use('/', router);
 
 app.listen(5000, () => {
     console.log('Server listening to port 5000');
-})
-import * as logics from '/ExpressJS-ToDoList/BackEnd/Services/logics.js';
+})import * as logics from '/ExpressJS-ToDoList/BackEnd/Services/logics.js';
 import bcrypt from 'bcrypt';
 import express from 'express';
-import { createToken, authenticated } from '/ExpressJS-ToDoList/BackEnd/Middlewares/authentication.js';
+import { createToken, authenticated, getUser } from '/ExpressJS-ToDoList/BackEnd/Middlewares/authentication.js';
 
 
 export const router = express();
@@ -69,27 +68,65 @@ router.post('/auth/login', async (req, res) => {
 
     const token = createToken(foundUser.username, password);
     const userId = foundUser.user_id;
-    console.log(foundUser);
 
     return res.status(200).json({ token, userId });
 });
 
-router.get('/protected/tasks', authenticated, async (req, res) => {
-    res.status(200).send('Welcome');
+router.post('/tasks/add/:userId', authenticated, async (req, res) => {
+    try {
+        console.log('hello');
+
+        const userId = req.params.userId;
+        const { task, date } = req.body;
+
+        logics.addItem(task, date, userId);
+
+        return res.status(200).json({ success: 'You have fully added a task'});
+
+    } catch (err){
+        return res.status(401);
+    }
 });
 
-router.post('/tasks/:userId/add', async (req, res) => {
-    const userId = req.params.userId;
-    const {task, date} = req.body;
-    const addItem = await logics.addItem(task, date, userId);
-    res.json(addItem);
+router.get('/getTasks/:userId', authenticated, async (req, res) => {
+    try {
+
+        const userId = req.params.userId;
+
+        const data = await logics.getTasks(userId);
+
+        const datas = data.rows[0];
+
+        console.log(datas);
+        
+        const { tasks, date, id } = datas;
+
+        return res.status(200).json({ tasks, date, id });
+
+    } catch (err){
+        console.log(err);
+        return res.json({ error: 'There is an error'}); 
+    }
+});
+
+router.delete('/removeTasks/:userId/:taskId', authenticated, (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const taskId = req.params.taskId;
+
+        logics.removeTask(userId, taskId);
+
+        return res.status(204).json({message: 'success'});
+    } catch (err) {
+        return res.status(400);
+    }
 });
 
 
 
 
 
-.
+
 import pkg  from 'pg';
 
 const { Pool } = pkg;
@@ -102,11 +139,10 @@ export const pool = new Pool({
     database: 'Express-ToDo'
 });
 
-.
 CREATE DATABASE Express-ToDO;
 
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
+    user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR NOT NULL,
     password VARCHAR NOT NULL
 );
@@ -138,8 +174,10 @@ INSERT INTO users (
 
 SELECT users.username, users.password FROM users 
 WHERE username = username;
-.
-import jwt from 'jsonwebtoken';
+
+SELECT tasks.tasks, tasks.date FROM tasks
+WHERE user_id = 9 
+ORDER BY tasks DESC LIMIT 1;import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = 'cfc441f8ca1d0058aab81d8d6eaeb975267b06d6683a5e1026795cbf37fa6a7f';
 
@@ -152,7 +190,18 @@ export const createToken = (userUsername, userPassword) => {
     return token;
 };
 
+export const getUser = (token) => {
+    return jwt.verify(token, SECRET_KEY, (err, decode) => {
+        if(err){
+            return null;
+        }
+        console.log(decode);
+        return decode.username
+    });
+};
+
 export const authenticated = (req, res, next) => {
+    
     const bearerHeader = req.headers['authorization'];
     const token = bearerHeader && bearerHeader.split(' ')[1];
 
@@ -165,7 +214,6 @@ export const authenticated = (req, res, next) => {
     });
 };
 
-.
 import { pool } from '/ExpressJS-ToDoList/BackEnd/Database/database.js';
 
 export async function duplicate(username, email){
@@ -189,14 +237,33 @@ export async function user(username){
     );
 }
 
+export async function getUserId(username){
+    return await pool.query(
+        `SELECT users.user_id FROM users WHERE username = $1`,
+        [username]
+    );
+}
+
 export async function addItem(task, date, userId) {
     return await pool.query(
-        `INSERT INTO items (task, date, user_id) VALUES ($1, $2, $3)`,
+        `INSERT INTO tasks (tasks, date, user_id) VALUES ($1, $2, $3)`,
         [task, date, userId]
     );
 }
-.
-<!DOCTYPE html>
+
+export async function getTasks(userId){
+    return await pool.query(
+        `SELECT tasks.tasks, tasks.date, tasks.Id FROM tasks WHERE user_id = $1
+         ORDER BY id DESC LIMIT 1;`, [ userId ]
+    );
+}
+
+export async function removeTask(userId, taskId){
+    return await pool.query(
+        `DELETE FROM tasks WHERE user_id = $1 AND tasks.Id = $2;`, 
+        [userId, taskId]
+    );
+}<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -263,17 +330,21 @@ export async function addItem(task, date, userId) {
 
         <section id="tasks" class="tasks">
           <input id="task" class="task glass add-card" aria-labelledby="addLabel">
+          <button id="button-add" type="submit">
           <img id="add" src="/FrontEnd/images/add.png" alt="add" class="add">
+          </button>
           </article>
-        </section>
+          <section id="allTask">
+            
+          </section> 
+        </section> 
       </main>
 
     </div>
   </div>
-  <script src="/FrontEnd/Service/home.js"></script>
+  <script src="/FrontEnd/Service/home.js" type="module"></script>
 </body>
 </html>
-.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -298,7 +369,6 @@ export async function addItem(task, date, userId) {
 <script src="/FrontEnd/Service/login.js"></script>
 </body>
 </html>
-.
 
 <!DOCTYPE html>
 <html lang="en">
@@ -328,7 +398,6 @@ export async function addItem(task, date, userId) {
 <script src="/FrontEnd/Service/signup.js"></script>
 </body>
 </html>
-.
 /* styles.css - Modern Responsive To-Do List + Login/Signup */
 
 /* ===== Reset ===== */
@@ -460,6 +529,7 @@ html, body {
 
 .task {
   display: flex;
+  margin-right: 70px; 
   gap: 1rem;
   align-items: center;
   padding: 1rem;
@@ -521,13 +591,10 @@ footer {
 }
 
 .add {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
   width: 20px;
   height: 20px;
   pointer-events: none;
+  cursor: pointer;
 }
 
 /* ===== Modern Login & Signup Styles ===== */
@@ -607,26 +674,116 @@ footer {
   position: absolute;
   top: 330px;
   margin-left: 5px;
-}.
-const add = document.getElementById('add');
+}
+
+#button-add {
+  position: absolute;
+  top: 15px;
+  left: 830px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  margin-right: 900px;
+  cursor: pointer;
+}
+
+.displaytask{
+  text-align: start;
+  display: flex;
+  margin-right: 60px;
+  font-weight: lighter;
+  font-size: 12px;
+  padding: 10px;
+  color: black;
+  border: solid black;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.remove {
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+  position:absolute;
+  left: 830px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  margin-right: 900px;
+  cursor: pointer;
+}
+
+#allTask {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+import * as websitelogics from './websitelogic.js';
+
+const add = document.getElementById('button-add');
 const tasks = document.getElementById('tasks');
 const task = document.getElementById('task');
+const allTask = document.getElementById('allTask');
 
-const user = JSON.parse(localStorage.getItem('user'));
+const userTasks = JSON.parse(localStorage.getItem('tasks')) || []; 
+const userId = JSON.parse(localStorage.getItem('user'));
+
+window.addEventListener('DOMContentLoaded', displayTask);
 
 add.addEventListener('click', async () => {
-    const response = await fetch(`http://localhost:5000/tasks/${userId}/add`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user?.token}`
-        },
-        body: JSON.stringify({
-            task: task.value,
-            date: '2024-1-23',
-        })
-    })
-});.
+
+    await websitelogics.addTasks(userId.userId, userId.token, task);
+    
+    const response = await websitelogics.getTasks(userId.userId, userId.token);
+
+    if(allTask.childElementCount != 0) allTask.innerHTML = '';
+
+    userTasks.push(response);
+    localStorage.setItem('tasks', JSON.stringify(userTasks));
+
+    displayTask();
+});
+
+function displayTask(){
+        console.log(userTasks);
+
+        for(let i = 0; i < userTasks.length; i++){
+        const createDiv = document.createElement('div');
+        createDiv.className = 'displaytask';
+        createDiv.id = userTasks[i].id;
+
+        console.log(userTasks[i].id);
+
+        const h1 = document.createElement('h1');
+        h1.textContent = userTasks[i].tasks;
+        h1.className = 'taskClass';
+
+        const createImg = document.createElement('img');
+        createImg.onclick = async () => {
+            if(createDiv.id === userTasks[i].id){
+                userTasks.splice[1, i];
+                localStorage.setItem('tasks', JSON.stringify(userTasks));
+            }
+            createDiv.remove();
+            console.log(createDiv.id);
+            websitelogics.removeTask(userId.userId, createDiv.id, userId.token);
+        };
+        
+        createImg.className = 'remove';
+        createImg.alt = 'remove';
+        createImg.src = '/FrontEnd/images/remove.png';
+
+        createDiv.append(h1, createImg);
+
+        allTask.appendChild(createDiv);
+
+        console.log('whatt');
+    }
+}
+
+
 const username = document.getElementById('username');
 const password = document.getElementById('password');
 const button = document.getElementById('button');
@@ -647,6 +804,7 @@ button.addEventListener('click', async () => {
     });
 
     const data = await response.json();
+    console.log(data);  
 
     if(data != null){
         localStorage.setItem('user', JSON.stringify(data));
@@ -654,7 +812,6 @@ button.addEventListener('click', async () => {
     }
 });
 
-.
 const username = document.getElementById('username');
 const email = document.getElementById('email');
 const password = document.getElementById('password');
@@ -684,4 +841,53 @@ button.addEventListener('click', async () => {
   } else {
      text.textContent = 'Incorrect confirm password'
   }
-});.
+});export async function addTasks(userId, token, task){
+    const response = await fetch(`http://localhost:5000/tasks/add/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            task: task.value,
+            date: '2024-1-23',
+            })
+        });;
+
+    const data = await response.json();
+
+    if(response.status === 200){
+        return data;
+    } 
+
+    return response.status;
+}
+
+export async function getTasks(userId, token){ 
+    const response1 = await fetch(`http://localhost:5000/getTasks/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+    const data = await response1.json();
+
+    if(response1.status === 200){
+        return data;
+    }
+
+    return response1.status;
+}
+
+export async function removeTask(userId, taskId, token){
+    const response = await fetch(`http://localhost:5000/removeTasks/${userId}/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    return response.status;
+}
+
