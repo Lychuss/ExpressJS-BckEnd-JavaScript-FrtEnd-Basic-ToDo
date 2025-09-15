@@ -29,6 +29,7 @@ export async function getUserId(username){
 }
 
 export async function addItem(task, date, userId) {
+    if(task === null) return;
     return await pool.query(
         `INSERT INTO tasks (tasks, date, user_id) VALUES ($1, $2, $3)`,
         [task, date, userId]

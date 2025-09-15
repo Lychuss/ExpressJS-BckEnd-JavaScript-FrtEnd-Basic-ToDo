@@ -1,4 +1,9 @@
+const currentDate = new Date();
+
+const date = currentDate.toLocaleDateString('en-PH'); 
+
 export async function addTasks(userId, token, task){
+    console.log(date);
     const response = await fetch(`http://localhost:5000/tasks/add/${userId}`, {
         method: 'POST',
         headers: {
@@ -7,7 +12,7 @@ export async function addTasks(userId, token, task){
         },
         body: JSON.stringify({
             task: task.value,
-            date: '2024-1-23',
+            date: date
             })
         });;
 

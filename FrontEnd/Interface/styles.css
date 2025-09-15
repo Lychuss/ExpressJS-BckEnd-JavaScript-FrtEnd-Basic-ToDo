@@ -288,9 +288,9 @@ footer {
   cursor: pointer;
 }
 
-.displaytask{
-  text-align: start;
+.displaytask {
   display: flex;
+  justify-content: space-between;
   margin-right: 60px;
   font-weight: lighter;
   font-size: 12px;
@@ -320,3 +320,15 @@ footer {
   flex-direction: column;
   gap: 20px;
 }
+
+span {
+  font-weight: bold;
+  font-size: 20px;
+  background-color: dark;
+}
+
+body.dark-theme {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+}
+

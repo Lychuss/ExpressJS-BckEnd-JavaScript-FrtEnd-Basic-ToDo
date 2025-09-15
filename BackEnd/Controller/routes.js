@@ -52,7 +52,7 @@ router.post('/auth/login', async (req, res) => {
 
     if(!unhashPass) return res.status(404).send('Incorrect password!');
 
-    const token = createToken(foundUser.username, password);
+    const token = createToken(foundUser.username);
     const userId = foundUser.user_id;
 
     return res.status(200).json({ token, userId });
@@ -83,11 +83,19 @@ router.get('/getTasks/:userId', authenticated, async (req, res) => {
 
         const datas = data.rows[0];
 
-        console.log(datas);
-        
-        const { tasks, date, id } = datas;
+        if(datas.tasks === null){
+            return res.status(400);
+        }
 
-        return res.status(200).json({ tasks, date, id });
+        const date = new Date(datas.date);
+
+        const formatted = date.toISOString().split('T')[0];
+
+        console.log(formatted);
+        
+        const { tasks, id } = datas;
+
+        return res.status(200).json({ tasks, formatted, id });
 
     } catch (err){
         console.log(err);

@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body id="bodies">
 
   <!-- Hidden controls for CSS-only behaviors -->
   <input type="radio" name="filter" id="filter-all" hidden checked>
@@ -32,14 +32,14 @@
         <div class="toggle" role="group" aria-label="Theme toggle">
           <span>Theme</span>
           <label class="switch" for="theme-toggle">
-            <input type="checkbox" aria-label="Toggle dark theme">
+            <input type="checkbox" id="themes-toggle" aria-label="Toggle dark theme" onclick="changeTheme()">
             <span class="track" aria-hidden="true"></span>
             <span class="thumb" aria-hidden="true"></span>
           </label>
         </div>
 
         <nav aria-label="Filters">
-          <label for="filter-all" class="nav-btn" role="button">
+          <label for="filter-all" class="nav-btn" role="button" href="#allTask">
             <span>📋</span>
             <span>All Tasks</span>
           </label>
@@ -50,6 +50,9 @@
           <label for="filter-completed" class="nav-btn" role="button">
             <span>✅</span>
             <span>Completed</span>
+          </label>
+          <label id="logout" class="nav-btn" role="button">
+            <span>Logout</span>
           </label>
         </nav>
       </aside>
@@ -77,6 +80,6 @@
 
     </div>
   </div>
-  <script src="/FrontEnd/Service/home.js" type="module"></script>
+  <script src="/FrontEnd/Service/home.js" type="module" defer></script>
 </body>
 </html>
